@@ -1,3 +1,5 @@
+![LLMUID — identifiers designed for unreliable LLM transcription](README.png)
+
 # LLMUID
 
 > Identifiers that resist hallucination, survive repeated LLM copying, and
