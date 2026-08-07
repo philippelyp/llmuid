@@ -42,6 +42,7 @@ implementation is wrong.
 |---|---|---|---|
 | PHP | [llmuid-php](https://github.com/philippelyp/llmuid-php) | Packagist `philippelyp/llmuid` | `composer require philippelyp/llmuid` |
 | Python | [llmuid-python](https://github.com/philippelyp/llmuid-python) | PyPI `llmuid` | `pip install llmuid` |
+| JavaScript | [llmuid-javascript](https://github.com/philippelyp/llmuid-javascript) | npm `llmuid` | `npm install llmuid` |
 
 ## What conformance means
 
@@ -55,10 +56,10 @@ Writing a new implementation means reading [llmuid.md](llmuid.md) and passing
 [vectors/](vectors/) — not reading an existing implementation's source. The
 vectors are the reference; the code is one rendering of it.
 
-Both implementations carry a copy of [vectors/](vectors/) inside the package
-and grade themselves against all 134 cases at runtime, through `self_test()` —
-the answer key ships with every install, and conformance is one method call
-away. The canonical set is this one; the copies follow it.
+All three implementations carry a copy of [vectors/](vectors/) inside the
+package and grade themselves against all 134 cases at runtime, through
+`self_test()` — the answer key ships with every install, and conformance is one
+method call away. The canonical set is this one; the copies follow it.
 
 ## Not a security mechanism
 

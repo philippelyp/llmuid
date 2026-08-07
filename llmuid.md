@@ -7,13 +7,14 @@ By Philippe Paquet
 
 This document is the design specification: it describes *what* the scheme
 guarantees and *why*, independent of any language or library. The
-implementations live in their own repositories — [llmuid-php][php] and
-[llmuid-python][python] — and are graded against the conformance vectors in
-[`vectors/`](vectors/), which live here beside the specification because they
-belong to no single language.
+implementations live in their own repositories — [llmuid-php][php],
+[llmuid-python][python] and [llmuid-javascript][javascript] — and are graded
+against the conformance vectors in [`vectors/`](vectors/), which live here
+beside the specification because they belong to no single language.
 
 [php]: https://github.com/philippelyp/llmuid-php
 [python]: https://github.com/philippelyp/llmuid-python
+[javascript]: https://github.com/philippelyp/llmuid-javascript
 
 ## Purpose
 
