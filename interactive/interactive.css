@@ -1,0 +1,367 @@
+/*
+ * LLMUID -- the interactive companion to the specification.
+ *
+ * Breakpoints are content-driven rather than device-named: 600px is where the
+ * hero channel stops fitting, 900px is where the wrap stops filling the
+ * viewport, and 760px is where the radius panel's two columns stop being two
+ * columns. There is no phone, tablet or desktop anywhere below -- only the
+ * widths at which something on this page breaks.
+ */
+
+:root{
+  --paper:#EDF1F4;
+  --panel:#FFFFFF;
+  --ink:#16232E;
+  --ink-soft:#4A5B69;
+  --line:#C9D3DB;
+  --line-soft:#DDE4E9;
+  --amber:#D9821F;
+  --amber-bg:#FBEEDC;
+  --green:#1E8A6E;
+  --green-bg:#DFF0EA;
+  --red:#BE3D3D;
+  --red-bg:#F7E3E1;
+  --blue:#2B5D8A;
+  --blue-bg:#E1EAF2;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --body:'Archivo',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:var(--paper);
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink);
+  line-height:1.55;
+  overflow-x:clip;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+section{padding:64px 0}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--blue);margin-bottom:10px;
+}
+h1{font-family:var(--mono);font-weight:700;font-size:clamp(28px,5vw,44px);letter-spacing:-.01em;line-height:1.15}
+h2{font-family:var(--mono);font-weight:600;font-size:clamp(20px,3vw,27px);margin-bottom:6px}
+.lede{color:var(--ink-soft);max-width:640px;margin-top:12px;font-size:17px}
+.sub{color:var(--ink-soft);max-width:680px;margin-bottom:28px}
+.mono{font-family:var(--mono)}
+
+/* ---------- STARTUP BANNER ---------- */
+/* The page failing loudly is the article practising what it documents, so this
+   is the first thing in the document and the first thing anyone sees. */
+.banner{
+  background:var(--red);color:#fff;padding:16px 0;
+  border-bottom:3px solid #8E2A2A;
+}
+.banner b{
+  display:block;font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;
+}
+.banner .reason{font-family:var(--mono);font-size:13px;overflow-wrap:anywhere;white-space:pre-wrap}
+.banner .after{font-size:13.5px;margin-top:8px;opacity:.92}
+
+/* ---------- HERO / CHANNEL ---------- */
+#hero{padding:72px 0 56px}
+.channel-panel{
+  margin-top:40px;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:28px 24px 20px;box-shadow:0 2px 10px rgba(22,35,46,.06);
+}
+.channel{display:flex;align-items:center;justify-content:space-between;gap:4px;position:relative}
+.hop{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:clamp(46px,14vw,86px);text-align:center;min-width:0;
+}
+.hop-node{
+  width:clamp(36px,11vw,52px);height:clamp(36px,11vw,52px);border-radius:8px;
+  border:1.5px solid var(--line);
+  background:var(--paper);display:flex;align-items:center;justify-content:center;
+  font-size:clamp(15px,4.5vw,22px);transition:border-color .3s,box-shadow .3s,background .3s;
+}
+.hop-node.active{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
+.hop-node.hit{border-color:var(--amber);background:var(--amber-bg);box-shadow:0 0 0 3px var(--amber-bg)}
+.hop-label{font-family:var(--mono);font-size:clamp(8.5px,2.4vw,10.5px);color:var(--ink-soft);letter-spacing:.05em}
+.wire{flex:1 1 auto;height:2px;background:var(--line);position:relative;min-width:6px}
+.wire::after{
+  content:'';position:absolute;top:-2px;width:6px;height:6px;border-radius:50%;
+  background:var(--blue);opacity:0;
+}
+.wire.pulse::after{animation:travel .55s linear}
+@keyframes travel{0%{left:0;opacity:1}100%{left:calc(100% - 6px);opacity:1}}
+.channel-id{
+  margin:26px auto 6px;text-align:center;font-family:var(--mono);
+  font-size:clamp(18px,4vw,30px);font-weight:600;letter-spacing:.06em;min-height:44px;
+  line-height:1.25;
+}
+/* The symbols stay on one baseline. Marking damage by lifting the damaged
+   symbols off it, as the draft did, reads as a broken string rather than as
+   emphasis -- in a monospace row where every other glyph lines up, that is the
+   one thing the eye reads as an error in the page. Colour carries it instead,
+   and line-height keeps the highlight box the size of the symbol rather than
+   the size of the line. */
+.channel-id .sym{display:inline-block;transition:color .25s,background .25s;border-radius:4px;padding:2px 1px}
+.channel-id .sym.delim{color:var(--ink-soft)}
+.channel-id .sym.dmg{color:var(--amber);background:var(--amber-bg)}
+.channel-id .sym.fix{color:var(--green);background:var(--green-bg)}
+.verdict{
+  text-align:center;font-family:var(--mono);font-size:13px;font-weight:600;min-height:40px;
+  letter-spacing:.04em;overflow-wrap:anywhere;
+}
+.verdict.ok{color:var(--green)}.verdict.warn{color:var(--amber)}.verdict.bad{color:var(--red)}
+.tallies{
+  display:flex;justify-content:center;gap:26px;margin-top:16px;padding-top:14px;
+  border-top:1px dashed var(--line);flex-wrap:wrap;
+}
+.tally{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+.tally b{font-size:16px;color:var(--ink);margin-right:5px}
+.tally.g b{color:var(--green)}.tally.a b{color:var(--amber)}.tally.r b{color:var(--red)}
+
+/* ---------- ANATOMY ---------- */
+.anatomy{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:32px 24px;box-shadow:0 2px 10px rgba(22,35,46,.06);
+}
+.anatomy-id{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-weight:600}
+.chunk{display:flex;gap:2px}
+/* A button rather than a decorated span: the reveal used to be a hover, and a
+   touchscreen has none to give. */
+.asym{
+  width:clamp(30px,6vw,46px);height:clamp(42px,8vw,60px);border:1.5px solid var(--line);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;font-weight:inherit;color:inherit;
+  font-size:clamp(18px,3.4vw,26px);background:var(--paper);cursor:pointer;
+  transition:transform .2s,border-color .2s,background .2s;
+}
+.anatomy.hl-payload .asym.payload{border-color:var(--blue);background:var(--blue-bg);transform:translateY(-3px)}
+.anatomy.hl-check .asym.check{border-color:var(--green);background:var(--green-bg);transform:translateY(-3px)}
+.asym:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.adelim{
+  align-self:center;color:var(--ink-soft);font-size:20px;padding:0 2px;
+  transition:color .2s,transform .2s;
+}
+.anatomy.hl-delim .adelim{color:var(--amber);transform:scale(1.3)}
+.legend{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.legend button{
+  font-family:var(--mono);font-size:12px;font-weight:600;padding:7px 14px;border-radius:99px;
+  border:1.5px solid var(--line);background:var(--paper);cursor:pointer;color:var(--ink);
+  transition:all .15s;
+}
+.legend button:focus-visible{border-color:var(--ink)}
+.legend button.on-payload{border-color:var(--blue);background:var(--blue-bg)}
+.legend button.on-check{border-color:var(--green);background:var(--green-bg)}
+.legend button.on-delim{border-color:var(--amber);background:var(--amber-bg)}
+.legend-note{
+  text-align:center;margin-top:16px;font-size:14.5px;color:var(--ink-soft);
+  min-height:66px;max-width:560px;margin-left:auto;margin-right:auto;
+}
+.alphabet{
+  margin-top:26px;padding-top:20px;border-top:1px dashed var(--line);
+  display:flex;flex-wrap:wrap;gap:5px;justify-content:center;
+}
+.alphachar{
+  font-family:var(--mono);font-size:14px;font-weight:600;width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--line);
+  border-radius:5px;background:var(--paper);
+}
+.alphachar.gone{color:var(--red);background:var(--red-bg);border-color:transparent;text-decoration:line-through;opacity:.75}
+.alpha-cap{width:100%;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin-top:8px}
+
+/* ---------- DAMAGE MODEL ---------- */
+.dmg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.dmg-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 16px;
+}
+.dmg-card h3{font-family:var(--mono);font-size:13.5px;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.dmg-freq{font-family:var(--mono);font-size:10.5px;color:var(--ink-soft);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.dmg-demo{
+  font-family:var(--mono);font-size:17px;font-weight:600;letter-spacing:.05em;
+  background:var(--paper);border-radius:6px;padding:12px 10px;text-align:center;min-height:46px;
+}
+/* vertical-align:top rather than the baseline default, because the duplicated
+   token below needs overflow:hidden to animate its width -- and an inline-block
+   with overflow other than visible takes its bottom margin edge as its
+   baseline, which lifts it clear of the line it belongs to. Every cell here is
+   one character in one font, so topping them all is the same layout with that
+   one anomaly gone. */
+.dmg-demo .t{display:inline-block;vertical-align:top;transition:all .3s}
+.dmg-demo .t.bad{color:var(--amber)}
+.dmg-demo .t.out{opacity:0;width:0;transform:scale(0)}
+.dmg-demo .t.grow{width:0;opacity:0;overflow:hidden;transition:width .4s,opacity .4s}
+.dmg-demo .t.grow.grown{width:2ch;opacity:1}
+.bimodal{
+  margin-top:34px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:26px 24px;
+}
+.bimodal h3{font-family:var(--mono);font-size:15px;margin-bottom:4px}
+.bimodal p{font-size:14.5px;color:var(--ink-soft);max-width:620px;margin-bottom:20px}
+/* The plot is a fixed height and the caption lives outside it, so five bars
+   share one baseline however many lines their captions run to. */
+.bars{display:flex;align-items:flex-start;gap:8px;padding:0 6px}
+.bar{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.bar-plot{height:150px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;height:0;transition:height 1s cubic-bezier(.2,.7,.3,1)}
+.bar-fill.g{background:var(--green)}
+.bar-fill.a{background:var(--amber)}
+.bar-fill.gap{background:var(--line)}
+.bar-fill.r{background:var(--red)}
+.bar-cap{font-family:var(--mono);font-size:10px;color:var(--ink-soft);text-align:center;line-height:1.3}
+.bar-pct{font-family:var(--mono);font-size:11px;font-weight:600}
+
+/* ---------- PIPELINE ---------- */
+.pipe-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+  box-shadow:0 2px 10px rgba(22,35,46,.06);
+}
+.pipe-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.pipe-controls button{
+  font-family:var(--mono);font-size:12px;font-weight:600;padding:9px 13px;border-radius:7px;
+  border:1.5px solid var(--line);background:var(--paper);cursor:pointer;color:var(--ink);
+  transition:all .15s;
+}
+.pipe-controls button:focus-visible{border-color:var(--ink)}
+.pipe-controls button:disabled{opacity:.45;cursor:wait}
+.cand-row{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:20px;
+  font-family:var(--mono);
+}
+.cand-label{font-size:11px;color:var(--ink-soft);letter-spacing:.1em;text-transform:uppercase}
+.cand{font-size:clamp(16px,3vw,22px);font-weight:600;letter-spacing:.04em;word-break:break-all;min-width:0}
+.stages{display:flex;flex-direction:column;gap:0}
+.stage{
+  display:grid;grid-template-columns:34px 1fr;gap:14px;padding:14px 6px;
+  border-left:2px solid var(--line);margin-left:16px;position:relative;
+  opacity:.38;transition:opacity .3s;min-width:0;
+}
+.stage>div{min-width:0}
+.stage.live{opacity:1}
+.stage-dot{
+  position:absolute;left:-9px;top:18px;width:16px;height:16px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--line);transition:all .3s;
+  font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+}
+.stage.pass .stage-dot{background:var(--green);border-color:var(--green)}
+.stage.route .stage-dot{background:var(--blue);border-color:var(--blue)}
+.stage.fail .stage-dot{background:var(--red);border-color:var(--red)}
+.stage.skip .stage-dot{background:var(--line);border-color:var(--line)}
+.stage-num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-soft);padding-top:2px;text-align:right}
+.stage h4{font-family:var(--mono);font-size:13.5px;font-weight:600;letter-spacing:.03em}
+.stage-msg{font-size:13.5px;color:var(--ink-soft);min-height:20px;margin-top:2px;overflow-wrap:anywhere}
+.stage-msg .mono{font-size:12.5px}
+.pipe-verdict{
+  margin-top:20px;padding:14px 18px;border-radius:8px;font-family:var(--mono);
+  font-size:14px;font-weight:600;letter-spacing:.04em;text-align:center;
+  border:1.5px solid var(--line);background:var(--paper);color:var(--ink-soft);
+  transition:all .3s;overflow-wrap:anywhere;
+}
+.pipe-verdict.ok{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.pipe-verdict.warn{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.pipe-verdict.bad{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.pipe-note{font-size:13px;color:var(--ink-soft);margin-top:14px}
+.pipe-note code{font-family:var(--mono);font-size:12px;background:var(--paper);padding:1px 5px;border-radius:4px;border:1px solid var(--line-soft);overflow-wrap:anywhere}
+
+/* ---------- RADIUS / SPARSITY ---------- */
+.radius-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+  display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;
+}
+@media(max-width:760px){.radius-panel{grid-template-columns:1fr}}
+.radius-svg{width:100%;height:auto;display:block}
+.radius-note{font-family:var(--mono);font-size:9px;fill:var(--ink-soft)}
+.radius-copy h3{font-family:var(--mono);font-size:15px;margin-bottom:8px}
+.radius-copy p{font-size:14.5px;color:var(--ink-soft);margin-bottom:12px}
+.radius-copy .rule{
+  font-family:var(--mono);font-size:12.5px;padding:10px 12px;border-radius:7px;margin-bottom:8px;
+  border:1px solid var(--line);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+}
+.rule .chip{font-weight:700;white-space:nowrap}
+.rule.g{background:var(--green-bg);border-color:var(--green)}.rule.g .chip{color:var(--green)}
+.rule.r{background:var(--red-bg);border-color:var(--red)}.rule.r .chip{color:var(--red)}
+.rule.b{background:var(--blue-bg);border-color:var(--blue)}.rule.b .chip{color:var(--blue)}
+
+/* ---------- CONTEXT / SWAP ---------- */
+.swap-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+}
+.swap-stage{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:8px 0 18px}
+.slot{
+  border:1.5px dashed var(--line);border-radius:8px;padding:14px 16px;
+  flex:1 1 240px;min-width:0;max-width:340px;transition:all .3s;
+}
+.slot .slot-name{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+.slot .slot-id{font-family:var(--mono);font-size:16px;font-weight:600;letter-spacing:.04em;transition:all .3s}
+.slot.ok{border-color:var(--green);background:var(--green-bg)}
+.slot.bad{border-color:var(--red);background:var(--red-bg)}
+.slot .slot-verdict{font-family:var(--mono);font-size:11px;font-weight:600;margin-top:8px;min-height:16px;overflow-wrap:anywhere}
+.slot.ok .slot-verdict{color:var(--green)}
+.slot.bad .slot-verdict{color:var(--red)}
+.swap-btnrow{text-align:center}
+.swap-btnrow button{
+  font-family:var(--mono);font-size:12px;font-weight:600;padding:9px 16px;border-radius:7px;
+  border:1.5px solid var(--line);background:var(--paper);cursor:pointer;transition:all .15s;color:var(--ink)
+}
+.swap-btnrow button:focus-visible{border-color:var(--ink)}
+.swap-note{font-size:14px;color:var(--ink-soft);max-width:640px;margin:14px auto 0;text-align:center}
+
+/* ---------- SELF CHECK ---------- */
+.grade-panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:26px 24px;
+}
+.grade-headline{font-family:var(--mono);font-size:clamp(15px,2.6vw,19px);font-weight:600;color:var(--ink-soft)}
+.grade-panel.passed .grade-headline{color:var(--green)}
+.grade-files{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:20px}
+.grade-file{
+  border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--paper);
+  font-family:var(--mono);font-size:12px;color:var(--ink-soft);
+}
+.grade-file b{display:block;font-size:19px;color:var(--ink);margin-bottom:2px}
+.grade-note{font-size:14px;color:var(--ink-soft);margin-top:18px;max-width:660px}
+
+/* ---------- SUMMARY ---------- */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.sum-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;
+  font-size:14px;
+}
+.sum-card b{font-family:var(--mono);font-size:12.5px;display:block;margin-bottom:4px;letter-spacing:.03em}
+.sum-card span{color:var(--ink-soft)}
+footer{padding:34px 0 46px;font-size:12.5px;color:var(--ink-soft);font-family:var(--mono)}
+footer a{color:var(--blue)}
+footer p+p{margin-top:8px}
+
+/* ---------- INPUT AND MOTION ---------- */
+/* Hover is a capability, not a given. Every reveal below is also reachable by
+   tapping the thing itself or the legend beside it. */
+@media(hover:hover){
+  .asym.payload:hover{border-color:var(--blue);background:var(--blue-bg);transform:translateY(-3px)}
+  .asym.check:hover{border-color:var(--green);background:var(--green-bg);transform:translateY(-3px)}
+  .legend button:hover{border-color:var(--ink)}
+  .pipe-controls button:hover:not(:disabled){border-color:var(--ink);transform:translateY(-1px)}
+  .swap-btnrow button:hover:not(:disabled){border-color:var(--ink)}
+}
+/* A finger is not a mouse pointer: 44px is the smallest target that is
+   comfortable to hit without aiming. */
+@media(pointer:coarse){
+  .legend button,.pipe-controls button,.swap-btnrow button{min-height:44px;padding-left:16px;padding-right:16px}
+  .asym{min-height:44px;min-width:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ---------- NARROW ---------- */
+/* Five hops and four wires need every pixel a 320px screen has, and the channel
+   is the first thing on the page -- so it scales down rather than scrolling
+   sideways. */
+@media(max-width:600px){
+  .wrap{padding:0 16px}
+  section{padding:40px 0}
+  #hero{padding:44px 0 36px}
+  .channel-panel{margin-top:28px;padding:18px 12px 14px}
+  .channel{gap:0}
+  .lede{font-size:16px}
+  .anatomy,.pipe-panel,.swap-panel,.radius-panel,.bimodal,.grade-panel{padding:20px 14px}
+  .stage{padding:12px 0 12px 4px;gap:10px;grid-template-columns:26px 1fr}
+  .tallies{gap:14px}
+}

@@ -25,6 +25,11 @@ anything more is a failure.** Fabricated identifiers are detectable, common
 damage is repairable, and everything else fails loudly instead of misrouting
 silently.
 
+**[See it work →](https://philippelyp.github.io/llmuid/)** — an interactive
+companion to the specification. It animates the damage model, and every verdict
+on it comes from a real implementation running in your browser, graded against
+the conformance vectors below before the first demo is wired up.
+
 ## This repository
 
 This is the specification, and it is authoritative. The implementations follow
@@ -35,6 +40,14 @@ implementation is wrong.
   guarantees and why, independent of any language.
 - **[vectors/](vectors/)** — the conformance vectors every implementation is
   graded against. Frozen; see [vectors/README.md](vectors/README.md).
+- **[interactive/](interactive/)** — the article above, exactly as it is
+  served. It is the one place this repository carries code, and it carries it
+  as a copy rather than as a second implementation:
+  [interactive/llmuid.js](interactive/llmuid.js) is
+  [llmuid-javascript](https://github.com/philippelyp/llmuid-javascript) v1.0.0
+  byte for byte, and `interactive.js` beside it is the page's own wiring, which
+  drives that class through its public API like any other consumer. The
+  specification itself defines no code and depends on none.
 
 ## Implementations
 
@@ -59,7 +72,9 @@ vectors are the reference; the code is one rendering of it.
 All three implementations carry a copy of [vectors/](vectors/) inside the
 package and grade themselves against all 134 cases at runtime, through
 `self_test()` — the answer key ships with every install, and conformance is one
-method call away. The canonical set is this one; the copies follow it.
+method call away. The canonical set is this one; the copies follow it. So does
+[the article](https://philippelyp.github.io/llmuid/), which grades itself in
+front of you rather than claiming a badge.
 
 ## Not a security mechanism
 

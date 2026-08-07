@@ -1,0 +1,56 @@
+#
+# Publish the interactive companion to GitHub Pages.
+#
+# interactive/ is the site, byte for byte, so there is no build step here and
+# nothing to assemble: the directory is uploaded as it sits in the repository.
+# That is the point of tracking the vector files inside it rather than fetching
+# them at deploy time -- the failure mode where CI serves something the source
+# tree never showed does not exist when CI runs no shell at all.
+#
+# The deployed page grades the engine it carries against those vector files on
+# every visit, so a deploy that dropped them raises the page's own banner.
+#
+# One-time setup, on the repository: Settings -> Pages -> Source -> GitHub
+# Actions. The workflow cannot set that itself and the first run fails without
+# it.
+#
+
+name: Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one in flight: a half-deployed
+# site is worse than a stale one.
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: interactive
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

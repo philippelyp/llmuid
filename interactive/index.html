@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLMUID — an interactive companion to the specification</title>
+<meta name="description" content="Identifiers built to survive being read, copied and re-emitted by language models. The damage model, the four validation layers and the repair contract, running live in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="interactive.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================= STARTUP BANNER =================
+     Raised by interactive.js when the engine fails its own conformance
+     vectors or cannot mint, and by the fallback script at the bottom of this
+     file when the module never loads at all. Everything below stays readable;
+     only the parts that would be lying stop. -->
+<div class="banner" id="banner" hidden>
+  <div class="wrap">
+    <b>The live demos on this page are not running</b>
+    <div class="reason" id="bannerReason"></div>
+    <div class="after">Every panel that needs the engine is inert rather than showing you a result nothing stands behind. The prose, the diagrams and the damage animations are unaffected.</div>
+  </div>
+</div>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <div class="wrap">
+    <div class="eyebrow">philippelyp/llmuid · running in this browser</div>
+    <h1>LLMUID</h1>
+    <p class="lede">Identifiers built for a strange transport: large language models. Fabrication is detectable, one slip repairs itself, anything worse fails loudly instead of misrouting silently.</p>
+
+    <div class="channel-panel">
+      <div class="channel" id="channel">
+        <div class="hop"><div class="hop-node" data-hop="0">🗄️</div><div class="hop-label">mint</div></div>
+        <div class="wire" data-wire="0"></div>
+        <div class="hop"><div class="hop-node" data-hop="1">🤖</div><div class="hop-label">model A</div></div>
+        <div class="wire" data-wire="1"></div>
+        <div class="hop"><div class="hop-node" data-hop="2">🤖</div><div class="hop-label">model B</div></div>
+        <div class="wire" data-wire="2"></div>
+        <div class="hop"><div class="hop-node" data-hop="3">🧑</div><div class="hop-label">human</div></div>
+        <div class="wire" data-wire="3"></div>
+        <div class="hop"><div class="hop-node" data-hop="4">🛡️</div><div class="hop-label">resolve</div></div>
+      </div>
+      <div class="channel-id" id="channelId"></div>
+      <div class="verdict" id="channelVerdict">&nbsp;</div>
+      <div class="tallies">
+        <div class="tally g"><b id="tallyPristine">0</b>pristine</div>
+        <div class="tally a"><b id="tallyRepaired">0</b>repaired (1 slip)</div>
+        <div class="tally r"><b id="tallyFailed">0</b>hard failures</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ANATOMY ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">01 · The identifier</div>
+    <h2>Every character is an argument</h2>
+    <p class="sub">10 symbols from a 29-character alphabet, grouped in pairs. Tap a part to see why it exists.</p>
+
+    <div class="anatomy" id="anatomy">
+      <div class="anatomy-id" id="anatomyId"></div>
+      <div class="legend">
+        <button type="button" data-part="payload">8 payload symbols</button>
+        <button type="button" data-part="check">2 check symbols</button>
+        <button type="button" data-part="delim">delimiters</button>
+      </div>
+      <div class="legend-note" id="legendNote">Tap a symbol, or pick a part above.</div>
+      <div class="alphabet" id="alphabet"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAMAGE MODEL ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">02 · The damage model</div>
+    <h2>Damage arrives in token-sized bursts</h2>
+    <p class="sub">Models emit tokens of a few characters, so one slip corrupts a short contiguous run — never a single random character. Four event kinds, replaying below.</p>
+
+    <div class="dmg-grid">
+      <div class="dmg-card">
+        <h3>Substitution</h3><div class="dmg-freq">most common</div>
+        <div class="dmg-demo" data-demo="sub"></div>
+      </div>
+      <div class="dmg-card">
+        <h3>Deletion</h3><div class="dmg-freq">second</div>
+        <div class="dmg-demo" data-demo="del"></div>
+      </div>
+      <div class="dmg-card">
+        <h3>Duplication</h3><div class="dmg-freq">third</div>
+        <div class="dmg-demo" data-demo="dup"></div>
+      </div>
+      <div class="dmg-card">
+        <h3>Transposition</h3><div class="dmg-freq">rare · humans / OCR</div>
+        <div class="dmg-demo" data-demo="swp"></div>
+      </div>
+    </div>
+
+    <div class="bimodal" id="bimodal">
+      <h3>Damage is bimodal</h3>
+      <p>Almost everything arrives pristine. A little arrives with exactly one slip. A tiny fraction arrives mangled. Almost nothing in between — which is what makes a strict single-event repair budget safe: past one slip, you're almost certainly in the untrustworthy regime.</p>
+      <!-- The caption sits outside .bar-plot on purpose: inside it, a two-line
+           caption would push its own bar up a line and the five would stop
+           sharing a baseline. -->
+      <div class="bars">
+        <div class="bar">
+          <div class="bar-plot"><span class="bar-pct">~99%</span><div class="bar-fill g" data-height="100%"></div></div>
+          <div class="bar-cap">pristine</div>
+        </div>
+        <div class="bar">
+          <div class="bar-plot"><span class="bar-pct">~1%</span><div class="bar-fill a" data-height="16%"></div></div>
+          <div class="bar-cap">one slip<br>→ repair</div>
+        </div>
+        <div class="bar">
+          <div class="bar-plot"><span class="bar-pct">≈0</span><div class="bar-fill gap" data-height="3%"></div></div>
+          <div class="bar-cap">two slips</div>
+        </div>
+        <div class="bar">
+          <div class="bar-plot"><span class="bar-pct">≈0</span><div class="bar-fill gap" data-height="3%"></div></div>
+          <div class="bar-cap">three</div>
+        </div>
+        <div class="bar">
+          <div class="bar-plot"><span class="bar-pct">tiny</span><div class="bar-fill r" data-height="8%"></div></div>
+          <div class="bar-cap">mangled<br>→ fail</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PIPELINE ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">03 · Validation &amp; repair</div>
+    <h2>Four layers, one job each</h2>
+    <p class="sub">Every button below hands a real candidate to the same <span class="mono">resolve()</span> an application would call, against a registry this page minted when it loaded. The narration is read back from what it returned and from the error it left behind.</p>
+
+    <div class="pipe-panel">
+      <div class="pipe-controls" id="pipeControls">
+        <button type="button" data-case="pristine">Pristine copy</button>
+        <button type="button" data-case="delim">Mangle delimiters</button>
+        <button type="button" data-case="sub">Substitute a token</button>
+        <button type="button" data-case="swp">Transpose a pair</button>
+        <button type="button" data-case="del">Drop a token</button>
+        <button type="button" data-case="dup">Duplicate a token</button>
+        <button type="button" data-case="fab">Fabricate an ID</button>
+        <button type="button" data-case="mangle">Heavy mangle</button>
+        <button type="button" data-case="short">Truncate hard</button>
+      </div>
+
+      <div class="cand-row">
+        <span class="cand-label">candidate</span>
+        <span class="cand" id="candText">—</span>
+      </div>
+
+      <div class="stages" id="stages">
+        <div class="stage" data-stage="0">
+          <div class="stage-dot"></div>
+          <div class="stage-num">1</div>
+          <div><h4>Normalize</h4><div class="stage-msg" data-msg="0"></div></div>
+        </div>
+        <div class="stage" data-stage="1">
+          <div class="stage-dot"></div>
+          <div class="stage-num">2</div>
+          <div><h4>Length routing</h4><div class="stage-msg" data-msg="1"></div></div>
+        </div>
+        <div class="stage" data-stage="2">
+          <div class="stage-dot"></div>
+          <div class="stage-num">3</div>
+          <div><h4>Checksum (mod-29, distance-3)</h4><div class="stage-msg" data-msg="2"></div></div>
+        </div>
+        <div class="stage" data-stage="3">
+          <div class="stage-dot"></div>
+          <div class="stage-num">4</div>
+          <div><h4>Registry repair (edit distance ≤ 2)</h4><div class="stage-msg" data-msg="3"></div></div>
+        </div>
+      </div>
+
+      <div class="pipe-verdict" id="pipeVerdict">Pick a scenario above</div>
+      <p class="pipe-note">Delimiters cost nothing: layer 1 strips everything outside the alphabet, so <code>K7—M3 XR_9D Q2</code> and <code>K7-M3-XR-9D-Q2</code> normalize identically. Length off by ±2 skips the checksum — a positional code is meaningless once symbols shift — and goes straight to repair.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RADIUS ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">04 · Why repair is safe</div>
+    <h2>Sparsity as an enforced invariant</h2>
+    <p class="sub">29⁸ ≈ 500 billion possible payloads; a deployment issues thousands to millions. Minting redraws any identifier within edit distance 4 of an existing one — so no single damage event can ever land a candidate ambiguously between two identifiers.</p>
+
+    <div class="radius-panel">
+      <svg class="radius-svg" viewBox="0 0 420 300" id="radiusSvg" role="img" aria-label="Diagram of sparse identifiers with non-overlapping repair radii">
+        <!-- populated by interactive.js -->
+      </svg>
+      <div class="radius-copy">
+        <h3>The single constant: radius 2</h3>
+        <p>One damage event costs at most 2 edit operations (a token slip touches ≤2 symbols; a transposition costs 1). That constant is the contract's entire tunable surface.</p>
+        <div class="rule g"><span class="chip">d ≤ 2, unique</span><span>silently repaired — one localized slip, guaranteed</span></div>
+        <div class="rule r"><span class="chip">d &gt; 2</span><span>hard failure — never guessed at, however confident</span></div>
+        <div class="rule b"><span class="chip">mint &gt; 4 apart</span><span>radii can never overlap → mis-repair impossible by construction</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SWAP ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">05 · The worst failure</div>
+    <h2>The swap: a valid ID in the wrong place</h2>
+    <p class="sub">A model occasionally substitutes one genuine identifier for another it saw elsewhere in context. The string is well-formed, registered, checksum-clean — per-identifier robustness can't catch it. The fix: derive the checksum's two required sums from the identifier's <em>context</em> (its slot, role, or parent). The two identifiers below were minted here, under the two slot names, and the verdicts are what <span class="mono">resolve()</span> says about them.</p>
+
+    <div class="swap-panel">
+      <div class="swap-stage">
+        <div class="slot" id="slotA">
+          <div class="slot-name">slot: invoice.customer</div>
+          <div class="slot-id" id="slotAId">—</div>
+          <div class="slot-verdict" id="slotAV">&nbsp;</div>
+        </div>
+        <div class="slot" id="slotB">
+          <div class="slot-name">slot: invoice.product</div>
+          <div class="slot-id" id="slotBId">—</div>
+          <div class="slot-verdict" id="slotBV">&nbsp;</div>
+        </div>
+      </div>
+      <div class="swap-btnrow">
+        <button type="button" id="swapBtn">Swap the two identifiers</button>
+      </div>
+      <p class="swap-note" id="swapNote">Each identifier's check symbols were minted against its own slot's context. Right now both resolve.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SELF CHECK ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">06 · Conformance</div>
+    <h2>This page grades itself</h2>
+    <p class="sub">The specification ships an answer key, and an implementation conforms when it passes every case in it. The engine driving this page carries that answer key and was graded against it before a single demo above was wired up — here, in your browser, a moment ago.</p>
+
+    <div class="grade-panel" id="gradePanel">
+      <div class="grade-headline">
+        <span id="gradeTotal">—</span> conformance cases passed, plus the minting invariants, in <span id="gradeTime">—</span> ms.
+      </div>
+      <div class="grade-files" id="gradeFiles"></div>
+      <p class="grade-note">The count is read off the vector files themselves rather than written into the page. If any case had failed, a red banner would be sitting at the top of this document naming it, and none of the panels above would have been wired up at all — because a page that kept rendering confident verdicts under a broken engine would be committing exactly the silent misrouting this scheme exists to prevent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUMMARY ================= -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">07 · Crib sheet</div>
+    <h2>The whole spec in eight cards</h2>
+    <div class="sum-grid" style="margin-top:22px">
+      <div class="sum-card"><b>Alphabet: 29, prime</b><span>Digits + consonants, no vowels/Y/L. Prime size makes the check code plain modular arithmetic.</span></div>
+      <div class="sum-card"><b>Shape: 8 + 2</b><span>8 random payload symbols, 2 check symbols, rendered as five hyphenated pairs aligned to token boundaries.</span></div>
+      <div class="sum-card"><b>Checksum: distance 3</b><span>Detects ALL 1–2 symbol errors unconditionally; fabrications pass at ~1/841, closed by registry lookup.</span></div>
+      <div class="sum-card"><b>Contract: repair 1, fail the rest</b><span>Edit distance ≤2 to exactly one issued ID → silent repair. Anything else → hard failure, never a guess.</span></div>
+      <div class="sum-card"><b>Delimiters: presentation only</b><span>Write strictly, read liberally. No parsing decision ever depends on them.</span></div>
+      <div class="sum-card"><b>Registry: append-only</b><span>Minting enforces &gt;4 separation; resolution is stable forever; retirement is app state, not deletion.</span></div>
+      <div class="sum-card"><b>Context binding</b><span>Check sums derived from slot/role via SHA-256 → a swapped valid ID fails validation. Re-verify inside repair or the defense is bypassed.</span></div>
+      <div class="sum-card"><b>Not a security mechanism</b><span>Statistically unguessable ≠ cryptographic. Never a secret, capability, or bearer token.</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Interactive companion to <a href="https://github.com/philippelyp/llmuid/blob/main/llmuid.md">llmuid.md</a> by Philippe Paquet · the specification and its conformance vectors live at <a href="https://github.com/philippelyp/llmuid">philippelyp/llmuid</a>.</p>
+    <p>The engine is <span class="mono">llmuid.js</span> beside this page: <a href="https://github.com/philippelyp/llmuid-javascript">llmuid-javascript</a> v1.0.0, the npm package <a href="https://www.npmjs.com/package/llmuid">llmuid</a>, served byte for byte as it is published and graded here against the vectors beside it. Nothing about the scheme is reimplemented for the demos.</p>
+  </div>
+</footer>
+
+<script type="module" src="interactive.js" id="engine"></script>
+
+<!--
+  The fallback, and it has to be a classic script: a module that fails to load
+  cannot report its own failure. interactive.js loads the engine with a dynamic
+  import and catches its own failure, so this covers the case underneath that
+  one -- a browser that cannot load interactive.js at all. Either signal is
+  enough: the error event on the module element, or the module never having
+  reached its first line by the time the page has finished loading.
+
+  It comes after the module element because it reaches for it by id, and a
+  module is deferred -- its error event cannot fire while the parser is still
+  running this script.
+-->
+<script>
+(function () {
+    var raised = false;
+
+    function fail(reason) {
+        if (raised === true) {
+            return;
+        }
+
+        raised = true;
+
+        document.getElementById("bannerReason").textContent = reason;
+        document.getElementById("banner").hidden = false;
+    }
+
+    // Opening this file directly is the first thing anyone tries and it cannot
+    // work: browsers refuse to load a module from a file:// origin, however new
+    // they are. Saying so beats blaming the browser's age, which is what every
+    // other reason on this page comes down to.
+
+    function served() {
+        return (window.location.protocol !== "file:");
+    }
+
+    var SERVE = "This page was opened from the filesystem. Browsers refuse to load JavaScript " +
+                "modules over file:// — however new they are — so the engine never had a chance " +
+                "to run. Serve the directory over http instead:\n\n" +
+                "    python3 -m http.server 8000\n\n" +
+                "then open http://localhost:8000/.";
+
+    document.getElementById("engine").addEventListener("error", function () {
+        fail(served()
+             ? "This browser could not load interactive.js at all — most likely it is too old for JavaScript modules or for the syntax the page is written in."
+             : SERVE);
+    });
+
+    window.addEventListener("load", function () {
+        if (window.llmuid_started !== true) {
+            fail(served()
+                 ? "This browser loaded interactive.js but never ran it — most likely it is too old for the JavaScript the engine is written in."
+                 : SERVE);
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
