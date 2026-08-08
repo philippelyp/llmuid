@@ -48,6 +48,9 @@ implementation is wrong.
   byte for byte, and `interactive.js` beside it is the page's own wiring, which
   drives that class through its public API like any other consumer. The
   specification itself defines no code and depends on none.
+- **[skill/](skill/)** — a skill for AI coding assistants, covering how to
+  integrate an implementation correctly. Language-neutral, like the vectors, and
+  not authoritative over [llmuid.md](llmuid.md).
 
 ## Implementations
 
@@ -56,6 +59,26 @@ implementation is wrong.
 | PHP | [llmuid-php](https://github.com/philippelyp/llmuid-php) | Packagist `philippelyp/llmuid` | `composer require philippelyp/llmuid` |
 | Python | [llmuid-python](https://github.com/philippelyp/llmuid-python) | PyPI `llmuid` | `pip install llmuid` |
 | JavaScript | [llmuid-javascript](https://github.com/philippelyp/llmuid-javascript) | npm `llmuid` | `npm install llmuid` |
+
+## For AI coding assistants
+
+Most of the ways an integration goes wrong are invisible from the API alone: a
+whole sentence handed to `resolve()`, a failure branch left as a `TODO`, or an
+identifier stored without the context it was minted under — which nothing can
+recover, because the context is not part of the identifier and the registry does
+not carry it.
+
+[skill/](skill/) is a skill in the portable Agent Skills format that covers
+exactly that ground. Install it into a project, or globally:
+
+```sh
+git clone https://github.com/philippelyp/llmuid
+cp -r llmuid/skill ~/.claude/skills/llmuid    # or .claude/skills/ in a project
+```
+
+It is one artifact for all three languages, it points at
+[llmuid.md](llmuid.md) rather than restating it, and where the two disagree the
+skill is wrong.
 
 ## What conformance means
 
